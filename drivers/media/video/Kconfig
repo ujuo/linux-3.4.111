@@ -72,10 +72,13 @@ config VIDEOBUF2_ION_NXP
     depends on ION_NXP
     select VIDEOBUF2_CORE
     select VIDEOBUF2_MEMOPS
+    select VIDEOBUF2_DMA_CONTIG
     help
       Internal memory management for Video Buffer2 by ION
 
-#source "drivers/media/video/nexell/Kconfig"
+source "drivers/media/video/nexell/Kconfig"
+source "drivers/media/video/nexell_new/Kconfig"
+source "drivers/media/video/nxp2120/Kconfig"
 
 #
 # Multimedia Video device configuration
@@ -491,6 +494,19 @@ config VIDEO_OV7670
 	  OV7670 VGA camera.  It currently only works with the M88ALP01
 	  controller.
 
+config SOC_CAMERA_OV2643
+	tristate "ov2643 camera support"
+	depends on VIDEO_V4L2 && I2C
+	help
+	  This is a ov2643 camera driver
+	  
+config SOC_CAMERA2_OV2643
+	tristate "ov2643 camera support"
+	depends on VIDEO_V4L2 && I2C
+	help
+	  This is a ov2643 camera driver
+
+	  
 config VIDEO_VS6624
 	tristate "ST VS6624 sensor support"
 	depends on VIDEO_V4L2 && I2C
@@ -1034,6 +1050,12 @@ config SOC_CAMERA_MT9V022
 	help
 	  This driver supports MT9V022 cameras from Micron
 
+config SOC_CAMERA_MT9V034
+	tristate "mt9v034 support"
+	depends on SOC_CAMERA && I2C
+	help
+	  This driver supports MT9V034 cameras from Aptina/Micron
+
 config SOC_CAMERA_RJ54N1
 	tristate "rj54n1cb0c support"
 	depends on SOC_CAMERA && I2C
@@ -1046,15 +1068,20 @@ config SOC_CAMERA_TW9910
 	help
 	  This is a tw9910 video driver
 
+config SOC_CAMERA_PIXELPLUS_POA030R
+	bool
+
 config SOC_CAMERA_POA030R
 	tristate "PixelPlus POA030R sensor support"
 	depends on SOC_CAMERA && I2C && VIDEO_V4L2
+	select SOC_CAMERA_PIXELPLUS_POA030R
 	help
 	  This is a PixelPlus VGA Camera POA030R support driver.
 
 config SOC_CAMERA2_POA030R
 	tristate "PixelPlus POA030R 2nd sensor support"
 	depends on SOC_CAMERA && I2C && VIDEO_V4L2
+	select SOC_CAMERA_PIXELPLUS_POA030R
 	help
 	  This is a PixelPlus VGA Camera POA030R support driver.
 
@@ -1087,6 +1114,18 @@ config SOC_CAMERA_OV2640
 	depends on SOC_CAMERA && I2C
 	help
 	  This is a ov2640 camera driver
+
+#config SOC_CAMERA_OV2643
+#	tristate "ov2643 camera support"
+#	depends on SOC_CAMERA && I2C
+#	help
+#	  This is a ov2643 camera driver
+
+config SOC_CAMERA_OV5640
+	tristate "ov5640 camera support"
+	depends on SOC_CAMERA && I2C
+	help
+	  This is a V4L2 camera driver for the OmniVision OV5640 sensor with MIPI
 
 config SOC_CAMERA_OV5642
 	tristate "ov5642 camera support"

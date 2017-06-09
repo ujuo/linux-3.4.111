@@ -90,7 +90,11 @@ obj-$(CONFIG_SOC_CAMERA_MT9M114)    += mt9m114.o
 obj-$(CONFIG_SOC_CAMERA_MT9T031)	+= mt9t031.o
 obj-$(CONFIG_SOC_CAMERA_MT9T112)	+= mt9t112.o
 obj-$(CONFIG_SOC_CAMERA_MT9V022)	+= mt9v022.o
+obj-$(CONFIG_SOC_CAMERA_MT9V034)	+= mt9v034.o
 obj-$(CONFIG_SOC_CAMERA_OV2640)		+= ov2640.o
+obj-$(CONFIG_SOC_CAMERA_OV2643)		+= ov2643.o
+obj-$(CONFIG_SOC_CAMERA2_OV2643)		+= ov2643.o
+obj-$(CONFIG_SOC_CAMERA_OV5640)		+= ov5640.o
 obj-$(CONFIG_SOC_CAMERA_OV5642)		+= ov5642.o
 obj-$(CONFIG_SOC_CAMERA_OV6650)		+= ov6650.o
 obj-$(CONFIG_SOC_CAMERA_OV772X)		+= ov772x.o
@@ -98,7 +102,7 @@ obj-$(CONFIG_SOC_CAMERA_OV9640)		+= ov9640.o
 obj-$(CONFIG_SOC_CAMERA_OV9740)		+= ov9740.o
 obj-$(CONFIG_SOC_CAMERA_RJ54N1)		+= rj54n1cb0c.o
 obj-$(CONFIG_SOC_CAMERA_TW9910)		+= tw9910.o
-obj-$(CONFIG_SOC_CAMERA_POA030R)	+= poa030r.o
+obj-$(CONFIG_SOC_CAMERA_PIXELPLUS_POA030R)	+= poa030r.o
 obj-$(CONFIG_SOC_CAMERA_EPC901)		+= epc901.o
 obj-$(CONFIG_SOC_CAMERA_OV7675)		+= ov7675.o
 obj-$(CONFIG_SOC_CAMERA_IMX132)		+= imx132_lginnotek.o
@@ -142,6 +146,9 @@ obj-$(CONFIG_VIDEOBUF2_MEMOPS)		+= videobuf2-memops.o
 obj-$(CONFIG_VIDEOBUF2_VMALLOC)		+= videobuf2-vmalloc.o
 obj-$(CONFIG_VIDEOBUF2_DMA_CONTIG)	+= videobuf2-dma-contig.o
 obj-$(CONFIG_VIDEOBUF2_DMA_SG)		+= videobuf2-dma-sg.o
+obj-$(CONFIG_VIDEOBUF2_CMA_PHYS)        += videobuf2-cma-phys.o
+obj-$(CONFIG_VIDEOBUF2_ION)             += videobuf2-ion.o
+obj-$(CONFIG_VIDEOBUF2_ION_NXP)		+= videobuf2-ion-nxp.o
 
 obj-$(CONFIG_V4L2_MEM2MEM_DEV) += v4l2-mem2mem.o
 
@@ -200,9 +207,11 @@ obj-$(CONFIG_VIDEO_SAMSUNG_S5P_TV)	+= s5p-tv/
 
 obj-$(CONFIG_VIDEO_SAMSUNG_S5P_G2D)	+= s5p-g2d/
 
-obj-$(CONFIG_V4L2_NEXELL)			+= nexell/
+obj-$(CONFIG_V4L2_NEXELL)				+= nexell/
+obj-$(CONFIG_NEW_V4L2_NEXELL)			+= nexell_new/
+obj-$(CONFIG_V4L2_DRIVER_NXP2120)		+= nxp2120/
 
-obj-$(CONFIG_BLACKFIN)                  += blackfin/
+obj-$(CONFIG_BLACKFIN)                += blackfin/
 
 obj-$(CONFIG_ARCH_DAVINCI)		+= davinci/
 
