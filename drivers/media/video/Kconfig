@@ -76,9 +76,9 @@ config VIDEOBUF2_ION_NXP
     help
       Internal memory management for Video Buffer2 by ION
 
-source "drivers/media/video/nexell/Kconfig"
-source "drivers/media/video/nexell_new/Kconfig"
-source "drivers/media/video/nxp2120/Kconfig"
+#source "drivers/media/video/nexell/Kconfig"
+#source "drivers/media/video/nexell_new/Kconfig"
+#source "drivers/media/video/nxp2120/Kconfig"
 
 #
 # Multimedia Video device configuration
