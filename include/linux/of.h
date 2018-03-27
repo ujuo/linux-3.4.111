@@ -90,7 +90,7 @@ static inline void of_node_put(struct device_node *node) { }
 extern struct device_node *allnodes;
 extern struct device_node *of_chosen;
 extern struct device_node *of_aliases;
-extern rwlock_t devtree_lock;
+extern raw_spinlock_t devtree_lock;
 
 static inline bool of_have_populated_dt(void)
 {
@@ -429,5 +429,20 @@ static inline int of_property_read_u32(const struct device_node *np,
 {
 	return of_property_read_u32_array(np, propname, out_value, 1);
 }
+/*
+ * struct property *prop;
+ * const char *s;
+ *
+ * of_property_for_each_string(np, "propname", prop, s)
+ *         printk("String value: %s\n", s);
+ */
+const char *of_prop_next_string(struct property *prop, const char *cur);
+
+#define of_property_for_each_string(np, propname, prop, s)	\
+	for (prop = of_find_property(np, propname, NULL),	\
+		s = of_prop_next_string(prop, NULL);		\
+		s;						\
+		s = of_prop_next_string(prop, s))
+	
 
 #endif /* _LINUX_OF_H */

@@ -42,6 +42,16 @@ struct vfe_device_info {
 };
 
 struct vfe_fmt {
+#if 1
+	enum v4l2_mbus_pixelcode mbus_code;	
+	char *name;
+	u32 pixelformat;
+	u32 num_planes;
+	u32 num_sw_planes;
+	u16	depth[VIDEO_MAX_PLANES];
+	bool is_separated;
+	u16 flags;
+#else
   unsigned char               name[32];
   enum v4l2_mbus_pixelcode    bus_pix_code;
   unsigned int                fourcc;          /* v4l2 format id */
@@ -49,6 +59,7 @@ struct vfe_fmt {
 //  enum pkt_fmt                mipi_pkt_fmt;
   unsigned char               depth;
   unsigned char               planes_cnt;
+#endif
 };
 
 struct vfe_size {
@@ -162,6 +173,18 @@ struct vfe_gpio {
   __hdle   flash_mode_io;
   __hdle   af_pwdn_io;
   __hdle   mclk_io;
+  __hdle   pclk_io;
+  __hdle   hsync_io;
+  __hdle   vsync_io;
+  __hdle   csi_d0_io;
+  __hdle   csi_d1_io;
+  __hdle   csi_d2_io;
+  __hdle   csi_d3_io;
+  __hdle   csi_d4_io;
+  __hdle   csi_d5_io;
+  __hdle   csi_d6_io;
+  __hdle   csi_d7_io;
+  
   struct   vfe_gpio_cfg power_en;
   struct   vfe_gpio_cfg reset;
   struct   vfe_gpio_cfg pwdn;
@@ -169,6 +192,18 @@ struct vfe_gpio {
   struct   vfe_gpio_cfg flash_mode;
   struct   vfe_gpio_cfg af_pwdn;
   struct   vfe_gpio_cfg mclk;
+  struct	vfe_gpio_cfg pclk;
+  struct	vfe_gpio_cfg hsync;
+  struct	vfe_gpio_cfg vsync;
+  struct	vfe_gpio_cfg csi_d0;
+  struct	vfe_gpio_cfg csi_d1;
+  struct	vfe_gpio_cfg csi_d2;
+  struct	vfe_gpio_cfg csi_d3;
+  struct	vfe_gpio_cfg csi_d4;
+  struct	vfe_gpio_cfg csi_d5;
+  struct	vfe_gpio_cfg csi_d6;
+  struct	vfe_gpio_cfg csi_d7;
+ 
 };
 
 struct vfe_regs {
@@ -276,7 +311,7 @@ struct ccm_config {
   struct vfe_gpio         gpio;
   struct vfe_power        power;
   struct vfe_clk_freq			clk_freq;
-//  struct vfe_device_info  ccm_info;
+  struct vfe_device_info  ccm_info;
   int                     act_used;
   char                    act_name[I2C_NAME_SIZE];
   unsigned int            act_slave;
@@ -286,10 +321,17 @@ struct ccm_config {
   __flash_driver_ic_type flash_type;
 };
 
+struct sunxi_vip_i2c_board_info {
+	struct i2c_board_info *board_info;
+	int i2c_adapter_id;
+};
+
 struct sunxi_vip_platform_data {
   unsigned int mipi_sel;
   unsigned int vip_sel;
   unsigned int isp_sel;
+  struct sunxi_vip_i2c_board_info *i2c;
+ 
 }; 
 
 
@@ -370,7 +412,7 @@ struct vfe_dev {
   unsigned int            isp_sel;
   struct ccm_config       ccm_cfg_content[MAX_INPUT_NUM];
   struct ccm_config       *ccm_cfg[MAX_INPUT_NUM];
-//  struct vfe_device_info  *ccm_info;        /* current config */
+  struct vfe_device_info  *ccm_info;        /* current config */
   struct i2c_board_info   dev_sensor[MAX_INPUT_NUM];
   struct i2c_board_info   dev_act[MAX_INPUT_NUM];
  unsigned int   	   device_valid_flag[MAX_INPUT_NUM];
@@ -407,6 +449,7 @@ struct vfe_dev {
   struct flash_dev_info                   *fl_dev_info;
   unsigned int						platform_id;
   unsigned int 			vfe_s_input_flag;
+  struct sunxi_vip_i2c_board_info *sensor_info;
 };
 
 #endif  /* __VFE__H__ */

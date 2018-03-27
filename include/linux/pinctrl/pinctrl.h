@@ -87,6 +87,11 @@ struct pinctrl_ops {
 			       unsigned *num_pins);
 	void (*pin_dbg_show) (struct pinctrl_dev *pctldev, struct seq_file *s,
 			  unsigned offset);
+	int (*dt_node_to_map) (struct pinctrl_dev *pctldev,
+			       struct device_node *np_config,
+			       struct pinctrl_map **map, unsigned *num_maps);
+	void (*dt_free_map) (struct pinctrl_dev *pctldev,
+			     struct pinctrl_map *map, unsigned num_maps);
 };
 
 /**

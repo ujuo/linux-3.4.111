@@ -121,7 +121,11 @@ extern void bsp_csi_disable(unsigned int sel);
 extern void bsp_csi_reset(unsigned int sel);
 extern int  bsp_csi_set_fmt(unsigned int sel, struct bus_info *bus_info, struct frame_info *frame_info);
 extern int  bsp_csi_set_size(unsigned int sel, struct bus_info *bus_info, struct frame_info *frame_info);
+#if defined(CONFIG_ARCH_SUN8IW8P1)
+extern void bsp_csi_set_addr(unsigned int sel, u32 buf_base_addr);
+#else
 extern void bsp_csi_set_addr(unsigned int sel, u64 buf_base_addr);
+#endif
 extern void bsp_csi_cap_start(unsigned int sel, unsigned int ch_total_num, enum csi_cap_mode csi_cap_mode);
 extern void bsp_csi_cap_stop(unsigned int sel, unsigned int ch_total_num, enum csi_cap_mode csi_cap_mode);
 extern void bsp_csi_int_enable(unsigned int sel, unsigned int ch, enum csi_int_sel interrupt);

@@ -22,6 +22,7 @@
 #include <linux/of.h>
 #include <linux/of_address.h>
 #include <linux/of_irq.h>
+#include <linux/err.h>
 #include <linux/sunxi_timer.h>
 #include <mach/clk/sunxi.h>
 #include <linux/delay.h>
@@ -147,7 +148,7 @@ static struct of_device_id sunxi_timer_dt_ids[] = {
 	{ }
 };
 #endif
-
+extern struct clk *of_clk_get(struct device_node *np, int index);
 void __init sunxi_timer_init(void)
 {
 #ifdef CONFIG_OF

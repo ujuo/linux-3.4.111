@@ -18,6 +18,7 @@
 #include <linux/irqdesc.h>
 #include <linux/irqdomain.h>
 #include <mach/gpio.h>
+#include <asm/gpio.h>
 #include <mach/sunxi-smc.h>
 
 #define SUNXI_PINCTRL_PIN_PA0	PINCTRL_PIN(SUNXI_PA_BASE + 0,  "PA0")
@@ -604,6 +605,7 @@ struct sunxi_pinctrl_group {
 };
 
 struct sunxi_pinctrl {
+	void __iomem			*membase;	
 	struct gpio_chip		chip;
 	struct sunxi_pinctrl_desc	*desc;
 	struct device			*dev;

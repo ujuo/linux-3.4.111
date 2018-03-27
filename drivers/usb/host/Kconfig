@@ -156,6 +156,22 @@ config USB_EHCI_HCD_OMAP
 	  Enables support for the on-chip EHCI controller on
 	  OMAP3 and later chips.
 
+config USB_EHCI_NXP4330
+	bool "EHCI support for NXP4330"
+	depends on USB_EHCI_HCD && ARCH_NXP4330
+	default y
+	--- help ---
+	  Enables support for the on-chip EHCI controller on
+	  NXP4330 and later chips.
+	  
+config USB_EHCI_NXP2120
+	bool "EHCI support for NXP2120"
+	depends on USB_EHCI_HCD && ARCH_NXP2120
+	default y
+	--- help ---
+	  Enables support for the on-chip EHCI controller on
+	  NXP2120 and later chips.
+	
 config USB_EHCI_MSM
 	bool "Support for MSM on-chip EHCI USB controller"
 	depends on USB_EHCI_HCD && ARCH_MSM
@@ -654,6 +670,12 @@ config USB_SUNXI_HCI
 	help
 	    SoftWinner SUNXI USB HCI.
 
+config USB_SUNXI_HCD0
+	tristate "SoftWinner SUNXI USB Host Controller0"
+	depends on USB_SUNXI_HCD && (USB_SUNXI_USB0_HOST_ONLY || USB_SUNXI_USB0_OTG)
+	help
+	    SoftWinner SUNXI USB2.0 Host Controller0.
+	    
 config USB_SUNXI_EHCI0
     tristate "SUNXI USB EHCI0"
 	depends on USB_SUNXI_HCI
@@ -701,5 +723,19 @@ config USB_SUNXI_OHCI3
 	depends on USB_SUNXI_HCI && ARCH_SUN8IW7
 	help
 	    SoftWinner SUNXI USB OHCI3.
-	    
+
+
+config USB_SUNXI_HSIC
+    tristate "SoftWinner SUNXI USB HSIC"
+	depends on USB_SUNXI_HCI
+	help
+	    SoftWinner SUNXI USB HSIC.
+
+#ifdef CONFIG_ARCH_SUN8IW8
+config USB_SUNXI_V3_UVC
+	tristate "SoftWinner V3 USB UVC"
+	depends on USB_SUNXI_HCI && ARCH_SUN8IW8
+		help
+		SoftWinner V3 USB UVC.
+#endif
 	    

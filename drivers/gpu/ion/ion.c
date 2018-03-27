@@ -39,6 +39,9 @@
 
 #include "ion_priv.h"
 
+#if defined(CONFIG_ION_SUNXI)
+
+#else
 /**
  * struct ion_device - the metadata of the ion device node
  * @dev:		the actual misc device
@@ -60,7 +63,6 @@ struct ion_device {
 	struct dentry *debug_root;
 };
 
-#if 0 /* ksw : move to ion_priv for sunxi. */
 /**
  * struct ion_client - a process/hw block local address space
  * @node:		node in the tree of all clients
@@ -86,7 +88,6 @@ struct ion_client {
 	pid_t pid;
 	struct dentry *debug_root;
 };
-#endif
 
 /**
  * ion_handle - a client local reference to a buffer
@@ -108,6 +109,7 @@ struct ion_handle {
 	unsigned int kmap_cnt;
 	int id;
 };
+#endif
 
 bool ion_buffer_fault_user_mappings(struct ion_buffer *buffer)
 {
@@ -409,7 +411,11 @@ static struct ion_handle *ion_uhandle_get(struct ion_client *client, int id)
 	return idr_find(&client->idr, id);
 }
 
-bool ion_handle_validate(struct ion_client *client, struct ion_handle *handle) /* ksw : for ION, make public/export */
+#if defined(CONFIG_ION_SUNXI)
+bool ion_handle_validate(struct ion_client *client, struct ion_handle *handle)
+#else
+static bool ion_handle_validate(struct ion_client *client, struct ion_handle *handle)
+#endif
 {
 	return (ion_uhandle_get(client, handle->id) == handle);
 }

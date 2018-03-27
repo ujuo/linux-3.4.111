@@ -53,6 +53,10 @@
 
 #undef OHCI_VERBOSE_DEBUG	/* not always helpful */
 
+#ifdef CONFIG_ARCH_SUN8IW8
+int sunxi_set_vbus(__u32 usbc_no);
+#endif
+
 /* For initializing controller (mask in an HCFS mode too) */
 #define	OHCI_CONTROL_INIT	OHCI_CTRL_CBSR
 #define	OHCI_INTR_INIT \
@@ -271,6 +275,15 @@ static int ohci_urb_dequeue(struct usb_hcd *hcd, struct urb *urb, int status)
 
 	spin_lock_irqsave (&ohci->lock, flags);
 	rc = usb_hcd_check_unlink_urb(hcd, urb, status);
+
+#ifdef CONFIG_USB_HCD_ENHANCE
+	if((ohci_readl (ohci, &ohci->regs->control) == 0x0)){
+		rc = 0;
+		ohci->rh_state = 0;
+	}
+#endif
+
+
 	if (rc) {
 		;	/* Do nothing */
 	} else if (ohci->rh_state == OHCI_RH_RUNNING) {
@@ -755,7 +768,39 @@ static irqreturn_t ohci_irq (struct usb_hcd *hcd)
 	 * work on all systems (edge triggering for OHCI can be a factor).
 	 */
 	ints = ohci_readl(ohci, &regs->intrstatus);
-
+	{
+		if(ints & OHCI_INTR_RHSC){
+			int portstatus0 = 0;
+	
+			portstatus0 = ohci_readl(ohci, &ohci->regs->roothub.portstatus[0]);
+			if((portstatus0 & RH_PS_CCS) && (portstatus0 & RH_PS_CSC)){
+	#ifdef CONFIG_ARCH_SUN8IW8
+	#ifdef CONFIG_USB_SUNXI_V3_UVC
+				sunxi_set_vbus(0);
+	#endif
+	#endif
+				printk("ohci_irq: fullspeed or lowspeed device connect\n");
+	#if defined(CONFIG_ARCH_SUN9IW1) && !defined(CONFIG_USB_SUSPEND)
+	{
+				int temp_val = 0;
+				temp_val = ohci_readl(ohci, (hcd->regs - 0x400) + 0x10);
+				temp_val = temp_val & (~(0x1));
+				ohci_writel (ohci, temp_val, (hcd->regs - 0x400) + 0x10);
+	}
+	#endif
+			}else if(!(portstatus0 & RH_PS_CCS) && (portstatus0 & RH_PS_CSC)){
+	#if defined(CONFIG_ARCH_SUN9IW1) && !defined(CONFIG_USB_SUSPEND)
+	{
+				int temp_val = 0;
+				temp_val = ohci_readl(ohci, (hcd->regs - 0x400) + 0x10);
+				temp_val = temp_val | (0x1);
+				ohci_writel (ohci, temp_val, (hcd->regs - 0x400) + 0x10);
+	}
+	#endif
+				printk("ohci_irq: fullspeed or lowspeed device disconnect\n");
+			}
+		}
+	}
 	/* Check for an all 1's result which is a typical consequence
 	 * of dead, unclocked, or unplugged (CardBus...) devices
 	 */
@@ -832,6 +877,15 @@ static irqreturn_t ohci_irq (struct usb_hcd *hcd)
 		spin_lock (&ohci->lock);
 		dl_done_list (ohci);
 		spin_unlock (&ohci->lock);
+#if 0
+		if (ohci->hcca->done_head == 0) {
+			ints &= ~OHCI_INTR_WDH;
+		} else {
+			spin_lock (&ohci->lock);
+			dl_done_list (ohci);
+			spin_unlock (&ohci->lock);
+		}
+#endif
 	}
 
 	if (quirk_zfmicro(ohci) && (ints & OHCI_INTR_SF)) {
@@ -895,8 +949,8 @@ static void ohci_stop (struct usb_hcd *hcd)
 	if (quirk_nec(ohci))
 		flush_work_sync(&ohci->nec_work);
 
-	ohci_usb_reset (ohci);
 	ohci_writel (ohci, OHCI_INTR_MIE, &ohci->regs->intrdisable);
+	ohci_usb_reset (ohci);	
 	free_irq(hcd->irq, hcd);
 	hcd->irq = 0;
 
@@ -1118,6 +1172,11 @@ MODULE_LICENSE ("GPL");
 #ifdef CONFIG_USB_OHCI_HCD_PLATFORM
 #include "ohci-platform.c"
 #define PLATFORM_DRIVER		ohci_platform_driver
+#endif
+
+#ifdef CONFIG_USB_SUNXI_HCI
+#include "ohci_sunxi.c"
+#define	PLATFORM_DRIVER		sunxi_ohci_hcd_driver
 #endif
 
 #if	!defined(PCI_DRIVER) &&		\

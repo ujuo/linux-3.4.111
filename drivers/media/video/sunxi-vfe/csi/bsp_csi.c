@@ -592,12 +592,19 @@ int bsp_csi_set_size(unsigned int sel, struct bus_info *bus_info, struct frame_i
  * buffer base address
  *
  */
-
+#if defined(CONFIG_ARCH_SUN8IW8P1)
+void bsp_csi_set_addr(unsigned int sel, u32 buf_base_addr)
+{
+  u32 buf_addr_plane0[MAX_CH_NUM];
+  u32 buf_addr_plane1[MAX_CH_NUM];
+  u32 buf_addr_plane2[MAX_CH_NUM];
+#else
 void bsp_csi_set_addr(unsigned int sel, u64 buf_base_addr)
 {
   u64 buf_addr_plane0[MAX_CH_NUM];
   u64 buf_addr_plane1[MAX_CH_NUM];
   u64 buf_addr_plane2[MAX_CH_NUM];
+#endif
   unsigned int ch,i,j,k,l,row,column;
 
   row = frm_arrange_gbl[sel].row;

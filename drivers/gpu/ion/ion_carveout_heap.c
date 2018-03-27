@@ -27,7 +27,9 @@
 
 #include <asm/mach/map.h>
 
-#if 0 /* ksw : move to ion_priv for SUNXI */
+#if defined(CONFIG_ION_SUNXI)
+
+#else
 struct ion_carveout_heap {
 	struct ion_heap heap;
 	struct gen_pool *pool;

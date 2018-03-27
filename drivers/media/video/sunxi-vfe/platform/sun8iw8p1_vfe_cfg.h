@@ -21,7 +21,11 @@
 
 #define VFE_ISP_REGULATOR				""
 #define VFE_CSI_REGULATOR				""
+#if defined(CONFIG_ARCH_SUN8IW8P1)
+#undef USE_SPECIFIC_CCI
+#else
 #define USE_SPECIFIC_CCI
+#endif
 #define CSI0_CCI_REG_BASE				0x01cb3000
 
 #define CSI0_REGS_BASE          				0x01cb0000

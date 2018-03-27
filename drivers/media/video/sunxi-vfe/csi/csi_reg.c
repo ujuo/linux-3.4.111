@@ -113,13 +113,21 @@ void csi_fmt_cfg(unsigned int sel, unsigned int ch, struct csi_fmt_cfg *csi_fmt_
 }
 
 /* buffer */
+#if defined(CONFIG_ARCH_SUN8IW8P1)
+void csi_set_buffer_address(unsigned int sel, unsigned int ch, enum csi_buf_sel buf, u32 addr)
+#else
 void csi_set_buffer_address(unsigned int sel, unsigned int ch, enum csi_buf_sel buf, u64 addr)
+#endif
 {
 	vfe_reg_clr_set(csi_base_addr[sel] + CSI_CH_F0_BUFA_REG_OFF+ch*CSI_CH_OFF+ (buf<<2), 0xffffffff,
 				addr >> ADDR_BIT_R_SHIFT);	
 }
 
+#if defined(CONFIG_ARCH_SUN8IW8P1)
+u32 csi_get_buffer_address(unsigned int sel, unsigned int ch, enum csi_buf_sel buf)
+#else
 u64 csi_get_buffer_address(unsigned int sel, unsigned int ch, enum csi_buf_sel buf)
+#endif
 {
 	unsigned int reg_val = vfe_reg_readl(csi_base_addr[sel] + CSI_CH_F0_BUFA_REG_OFF + ch*CSI_CH_OFF + (buf<<2));
 	return reg_val << ADDR_BIT_R_SHIFT;
@@ -128,11 +136,13 @@ u64 csi_get_buffer_address(unsigned int sel, unsigned int ch, enum csi_buf_sel b
 /* capture */
 void csi_capture_start(unsigned int sel, unsigned int ch_total_num, enum csi_cap_mode csi_cap_mode)
 {
+	printk("%s enter sel %d ch_total_num %d csi_cap_mode %d\n", __func__, sel, ch_total_num,csi_cap_mode);
 	u32 reg_val =	(((ch_total_num == 4) ? csi_cap_mode:0)<<24) +
                        (((ch_total_num == 3) ? csi_cap_mode:0)<<16) + 
                        (((ch_total_num == 2) ? csi_cap_mode:0)<<8 )+
                        (((ch_total_num == 1) ? csi_cap_mode:0));
        	vfe_reg_writel(csi_base_addr[sel] + CSI_CAP_REG_OFF, reg_val);
+   
 }
 
 void csi_capture_stop(unsigned int sel, unsigned int ch_total_num, enum csi_cap_mode csi_cap_mode)

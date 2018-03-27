@@ -15,6 +15,7 @@
 
 menuconfig USB_GADGET
 	tristate "USB Gadget Support"
+	default n if ARCH_SUNXI
 	select NLS
 	help
 	   USB is a master/slave protocol, organized with one master
@@ -125,6 +126,7 @@ config USB_GADGET_STORAGE_NUM_BUFFERS
 #
 choice
 	prompt "USB Peripheral Controller"
+	default n if ARCH_SUNXI
 	help
 	   A USB device uses a controller to talk to its host.
 	   Systems should have only one such upstream link.
@@ -541,7 +543,7 @@ config USB_GADGET_SUPERSPEED
 #
 choice
 	tristate "USB Gadget Drivers"
-	default USB_ETH
+	default y#USB_ETH
 	help
 	  A Linux "Gadget Driver" talks to the USB Peripheral Controller
 	  driver through the abstract "gadget" API.  Some other operating
@@ -624,6 +626,7 @@ config GADGET_UAC1
 
 config USB_ETH
 	tristate "Ethernet Gadget (with CDC Ethernet support)"
+	default n
 	depends on NET
 	select CRC32
 	help

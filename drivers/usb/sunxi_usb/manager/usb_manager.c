@@ -12,7 +12,6 @@
  * the License, or (at your option) any later version.
  *
  */
-
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/delay.h>
@@ -611,6 +610,33 @@ static int usb_host_init_status(char *usbc)
 		return 0;
 	}
 }
+
+
+int usb_otg_id_status(void)
+{
+	struct usb_cfg *cfg = NULL;
+	int id_status = -1;
+
+	cfg = &g_usb_cfg;
+	if(cfg == NULL){
+		return -1;
+	}
+
+	if(cfg->port[0].port_type == USB_PORT_TYPE_DEVICE){
+		return 1;
+	}
+
+	if (cfg->port[0].port_type != USB_PORT_TYPE_OTG) {
+		return -1;
+	}
+	if(cfg->port[0].id.valid){
+		id_status = __gpio_get_value(cfg->port[0].id.gpio_set.gpio.gpio);
+	}
+
+	return id_status;
+}
+EXPORT_SYMBOL(usb_otg_id_status);
+
 #endif
 
 static int __init usb_manager_init(void)

@@ -986,7 +986,7 @@ out:
 
 static unsigned int sunxi_i2c_functionality(struct i2c_adapter *adap)
 {
-	return I2C_FUNC_I2C|I2C_FUNC_10BIT_ADDR|I2C_FUNC_SMBUS_EMUL;
+	return I2C_FUNC_I2C;//I2C_FUNC_SMBUS_EMUL;//I2C_FUNC_I2C|I2C_FUNC_10BIT_ADDR|I2C_FUNC_SMBUS_EMUL;
 }
 
 
@@ -1054,7 +1054,6 @@ static int sunxi_i2c_clk_init(struct sunxi_i2c *i2c)
 static int sunxi_i2c_clk_exit(struct sunxi_i2c *i2c)
 {
 	twi_disable_bus(i2c->base_addr);
-
 	return 0;
 }
 #endif
@@ -1080,7 +1079,8 @@ static int sunxi_i2c_hw_init(struct sunxi_i2c *i2c, struct sunxi_i2c_platform_da
 		I2C_ERR("[i2c%d] init i2c clock failed!\n", i2c->bus_num);
 		return -1;
 	}
-
+	twi_disable_lcr(i2c->base_addr,1);
+	twi_disable_lcr(i2c->base_addr,0);
 	twi_soft_reset(i2c->base_addr);
 
 	return ret;

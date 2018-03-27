@@ -108,6 +108,9 @@ struct usb_request {
 
 	int			status;
 	unsigned		actual;
+#if defined(CONFIG_ARCH_SUN8IW8)
+	int dma_flag;
+#endif
 };
 
 /*-------------------------------------------------------------------------*/

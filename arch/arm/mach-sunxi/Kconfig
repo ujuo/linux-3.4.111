@@ -263,7 +263,7 @@ endif
 
 config SUNXI_GIC_ACCESS_SS
     bool "Enable Sunxi GIC Access SS Protect"
-    depends on ARCH_SUN8IW6
+    depends on ARCH_SUN8IW6 || ARCH_SUN8IW8
     default y
     help
         Support for Sunxi GIC Access SS Protect

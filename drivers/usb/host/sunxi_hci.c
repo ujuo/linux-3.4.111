@@ -45,6 +45,12 @@
 
 #include  "sunxi_hci.h"
 
+#ifdef CONFIG_USB_SUNXI_USB_MANAGER
+#if defined (CONFIG_ARCH_SUN8IW8) || defined (CONFIG_ARCH_SUN8IW7)
+int usb_otg_id_status(void);
+#endif
+#endif
+
 #if defined (CONFIG_ARCH_SUN8IW5) || defined (CONFIG_ARCH_SUN8IW9) || defined (CONFIG_ARCH_SUN8IW8) || defined (CONFIG_ARCH_SUN8IW7)
 #define  USBPHYC_REG_o_PHYCTL		    0x0410
 #else
@@ -1734,7 +1740,7 @@ static void free_pin(struct sunxi_hci_hcd *sunxi_hci)
 
 static void __sunxi_set_vbus(struct sunxi_hci_hcd *sunxi_hci, int is_on)
 {
-	u32 on_off = 0;
+	//u32 on_off = 0;
 
 	DMSG_INFO("[%s]: Set USB Power %s\n", sunxi_hci->hci_name, (is_on ? "ON" : "OFF"));
 
@@ -1742,16 +1748,28 @@ static void __sunxi_set_vbus(struct sunxi_hci_hcd *sunxi_hci, int is_on)
 	sunxi_hci->power_flag = is_on;
 
 	/* set power */
-	if(sunxi_hci->drv_vbus_gpio_set.gpio.data == 0){
-		on_off = is_on ? 1 : 0;
-	}else{
-		on_off = is_on ? 0 : 1;
+	//if(sunxi_hci->drv_vbus_gpio_set.gpio.data == 0){
+	//	on_off = is_on ? 1 : 0;
+	//}else{
+	//	on_off = is_on ? 0 : 1;
+	//}
+
+//no care of usb0 vbus when otg connect pc setup system without battery and to return
+#ifdef CONFIG_USB_SUNXI_USB_MANAGER
+#if defined (CONFIG_ARCH_SUN8IW8) || defined (CONFIG_ARCH_SUN8IW7)
+	if(sunxi_hci->usbc_no == HCI0_USBC_NO){
+		if(is_on){
+			if(usb_otg_id_status() == 1){
+				return;
+			}
+		}
 	}
+#endif
+#endif
 
 	if(sunxi_hci->drv_vbus_gpio_valid){
-		__gpio_set_value(sunxi_hci->drv_vbus_gpio_set.gpio.gpio, on_off);
+		__gpio_set_value(sunxi_hci->drv_vbus_gpio_set.gpio.gpio, is_on);
 	}
-
 	return;
 }
 
@@ -1978,6 +1996,31 @@ static struct platform_device sunxi_usb_ohci_device[] = {
 };
 #endif
 
+
+#ifdef CONFIG_ARCH_SUN8IW8
+int sunxi_usb_enable_ehci(__u32 usbc_no);
+int sunxi_usb_disable_ehci(__u32 usbc_no);
+
+static void sunxi_usbc_work(struct work_struct *data)
+{
+	struct sunxi_hci_hcd *sunxi_hci  = NULL;
+
+	sunxi_hci = &sunxi_ehci0;
+
+	printk("sunxi_usbc_work, usbc:%d\n", sunxi_hci->usbc_no);
+
+	__sunxi_set_vbus(sunxi_hci, 0);
+	sunxi_usb_disable_ehci(HCI0_USBC_NO);
+	msleep(100);
+
+	sunxi_usb_enable_ehci(HCI0_USBC_NO);
+	__sunxi_set_vbus(sunxi_hci, 1);
+
+	printk("end sunxi_usbc_work\n");
+
+}
+#endif
+
 static int init_sunxi_hci(struct sunxi_hci_hcd *sunxi_hci, u32 usbc_no, u32 ohci, const char *hci_name)
 {
 	s32 ret = 0;
@@ -2124,7 +2167,9 @@ static int __init sunxi_hci_init(void)
 #ifdef  CONFIG_USB_SUNXI_OHCI0
 
 		init_sunxi_hci(&sunxi_ohci0, HCI0_USBC_NO, 1, ohci_name);
-
+#ifdef CONFIG_ARCH_SUN8IW8
+		INIT_WORK(&sunxi_ohci0.usbc_work, sunxi_usbc_work);
+#endif
 #ifndef  CONFIG_USB_SUNXI_EHCI0
 		alloc_pin(&sunxi_ohci0);
 #endif

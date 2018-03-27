@@ -260,8 +260,13 @@ void csi_disable(unsigned int sel);
 void csi_if_cfg(unsigned int sel, struct csi_if_cfg *csi_if_cfg);
 void csi_timing_cfg(unsigned int sel, struct csi_timing_cfg *csi_tmg_cfg);
 void csi_fmt_cfg(unsigned int sel, unsigned int ch, struct csi_fmt_cfg *csi_fmt_cfg);
+#if defined(CONFIG_ARCH_SUN8IW8P1)
+void csi_set_buffer_address(unsigned int sel, unsigned int ch, enum csi_buf_sel buf, u32 addr);
+u32 csi_get_buffer_address(unsigned int sel, unsigned int ch, enum csi_buf_sel buf);
+#else
 void csi_set_buffer_address(unsigned int sel, unsigned int ch, enum csi_buf_sel buf, u64 addr);
 u64 csi_get_buffer_address(unsigned int sel, unsigned int ch, enum csi_buf_sel buf);
+#endif
 void csi_capture_start(unsigned int sel, unsigned int ch_total_num, enum csi_cap_mode csi_cap_mode);
 void csi_capture_stop(unsigned int sel, unsigned int ch_total_num, enum csi_cap_mode csi_cap_mode);
 void csi_capture_get_status(unsigned int sel, unsigned int ch, struct csi_capture_status *status);

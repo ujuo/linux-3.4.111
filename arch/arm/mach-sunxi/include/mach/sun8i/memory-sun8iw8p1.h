@@ -17,12 +17,12 @@
 
 #define PLAT_PHYS_OFFSET         UL(0x40000000)
 #ifdef CONFIG_EVB_PLATFORM
-#define PLAT_MEM_SIZE            SZ_2G
+#define PLAT_MEM_SIZE            SZ_64M /*SZ_2G*/
 #else
 #define PLAT_MEM_SIZE            SZ_256M
 #endif
 
-#define SYS_CONFIG_MEMBASE       (PLAT_PHYS_OFFSET + SZ_32M + SZ_16M)           /* 0x43000000 */
+#define SYS_CONFIG_MEMBASE       (0x43ffe000)/*PLAT_PHYS_OFFSET + SZ_32M + SZ_16M)*/           /* 0x43000000 */
 #define SYS_CONFIG_MEMSIZE       (SZ_128K)                                      /* 0x00020000 */
 
 #define SUPER_STANDBY_MEM_BASE   (PLAT_PHYS_OFFSET + SZ_32M + SZ_16M + SZ_512K) /* 0x43080000 */

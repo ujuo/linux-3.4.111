@@ -107,7 +107,12 @@ struct ion_platform_heap {
  */
 struct ion_platform_data {
 	int nr;
+#if defined(CONFIG_ION_SUNXI)
 	struct ion_platform_heap heaps[];
+#else
+	struct ion_platform_heap *heaps;
+#endif
+//	struct ion_platform_heap heaps[];
 };
 
 /**

@@ -3,7 +3,7 @@
  *
  * Copyright(c) 2013-2015 Allwinnertech Co., Ltd.
  *      http://www.allwinnertech.com
- *
+ *                                               
  * Author: liugang <liugang@allwinnertech.com>
  *
  * sun8i platform file
@@ -31,6 +31,7 @@
 #include <linux/i2c.h>
 #include <linux/mtd/nand.h>
 #include <linux/mtd/partitions.h>
+#include <linux/pinctrl/pinconf-sunxi.h>
 
 #include <asm/pmu.h>
 #include <asm/hardware/gic.h>
@@ -43,6 +44,8 @@
 #include <mach/platform.h>
 #include <mach/sunxi-chip.h>
 #include <mach/sunxi-smc.h>
+#include <mach/gpio.h>
+
 
 
 
@@ -243,9 +246,25 @@ static struct plat_serial8250_port serial_platform_data[] = {
 		.iotype         = UPIO_MEM32,
 		.regshift       = 2,
 		.uartclk        = 24000000,
-	}, {
-		.flags          = 0,
-	}
+	}, 	{
+		.membase        = (void __iomem *)(SUNXI_UART1_VBASE),
+		.mapbase        = (resource_size_t)SUNXI_UART1_PBASE,
+		.irq            = SUNXI_IRQ_UART1,
+		.flags          = UPF_BOOT_AUTOCONF|UPF_IOREMAP,
+		.iotype         = UPIO_MEM32,
+		.regshift       = 2,
+		.uartclk        = 24000000,
+	},{
+		.membase        = (void __iomem *)(SUNXI_UART2_VBASE),
+		.mapbase        = (resource_size_t)SUNXI_UART2_PBASE,
+		.irq            = SUNXI_IRQ_UART2,
+		.flags          = UPF_BOOT_AUTOCONF|UPF_IOREMAP,
+		.iotype         = UPIO_MEM32,
+		.regshift       = 2,
+		.uartclk        = 24000000,
+	},{
+		.flags = 0,
+	},
  };
 
 static struct platform_device serial_dev = {
@@ -255,6 +274,22 @@ static struct platform_device serial_dev = {
 		.platform_data = &serial_platform_data[0],
 	}
 };
+/*
+static struct platform_device serial_dev1 = {
+	.name = "serial8250",
+	.id = PLAT8250_DEV_PLATFORM1,
+	.dev = {
+		.platform_data = &serial_platform_data[1],
+	}
+};
+
+static struct platform_device serial_dev2 = {
+	.name = "serial8250",
+	.id = PLAT8250_DEV_PLATFORM2,
+	.dev = {
+		.platform_data = &serial_platform_data[2],
+	}
+};*/
 #endif
 
 #if defined(CONFIG_CPU_HAS_PMU)
@@ -360,6 +395,18 @@ static struct platform_device sunxi_nand_dev  = {
 };
 #endif
 
+#if 0
+#if defined(CONFIG_SOC_CAMERA_POA030R) || defined(CONFIG_SOC_CAMERA_POA030R_MODULE)
+
+static struct i2c_board_info poa030r_i2c_boardinfo[] = {
+    {
+        I2C_BOARD_INFO("poa030", 0xDC>>1),
+    },
+};
+#endif
+#endif
+
+#if 0
 /* I2C devices */
 static struct i2c_board_info  gc2155_i2c_boardinfo[] = {
 	{
@@ -373,10 +420,13 @@ static struct i2c_board_info pcf8563_i2c_boardinfo[] = {
 		I2C_BOARD_INFO("pcf8563", 0xA2 >> 1),
 	},
 };
+#endif
 
 static struct platform_device *sunxi_dev[] __initdata = {
 #if defined(CONFIG_SERIAL_8250) || defined(CONFIG_SERIAL_8250_MODULE)
 	&serial_dev,
+//	&serial_dev1,
+//	&serial_dev2,	
 #endif
 #if defined(CONFIG_CPU_HAS_PMU)
 	&sunxi_pmu_dev,
@@ -450,7 +500,7 @@ static void __init sun8i_fixup(struct tag *tags, char **from,
 					t->u.mem.size >> 20);
 			mem_start = t->u.mem.start;
 			mem_size = t->u.mem.size;
-#if defined(CONFIG_ION) || defined(CONFIG_ION_MODULE)
+#if defined(CONFIG_ION_SUNXI) || defined(CONFIG_ION_MODULE)
 			ion_reserve_common(CONFIG_ION_SUNXI_RESERVE_LIST,0,1);
 #endif
 			return;
@@ -534,6 +584,15 @@ void __init sunxi_map_io(void)
 
 static void __init sunxi_dev_init(void)
 {
+	unsigned int *p = 0xf1c20824;
+	unsigned int *p1 = 0xf1c20828;	
+
+//	printk("================================================0xF1C20824 0x%X 0xF1C20828 0x%X\n",*p, *p1);
+	//SUNXI_PINCFG_PACK(SUNXI_PINCFG_TYPE_FUNC, 2);
+	//printk("================================================0xF1C20824 0x%X 0xF1C20828 0x%X\n",*p, *p1);
+	*p &= ~0xFF;
+	*p = *p|0x22;
+//	printk("================================================0xF1C20824 0x%X 0xF1C20828 0x%X\n",*p, *p1);	
 #ifdef CONFIG_OF
 	of_platform_populate(NULL, of_default_bus_match_table, NULL, NULL);
 #else
@@ -555,6 +614,9 @@ static void __init sunxi_dev_init(void)
 
 
 #endif
+//	pin_config_set(SUNXI_PINCTRL,SUNXI_PINCTRL_PIN_PB5,SUNXI_PINCFG_PACK(SUNXI_PINCTRL_TYPE_FUNC,1));
+//	pin_config_set(SUNXI_PINCTRL,SUNXI_PINCTRL_PIN_PB5,SUNXI_PINCFG_PACK(SUNXI_PINCTRL_TYPE_DRV,2));
+//	pin_config_set(SUNXI_PINCTRL,SUNXI_PINCTRL_PIN_PB5,SUNXI_PINCFG_PACK(SUNXI_PINCTRL_TYPE_DAT,1));
 #if 0
 	printk("PL4 power on\n");
 	pin_config_set(SUNXI_PINCTRL,SUNXI_PINCTRL_PIN_PL4,SUNXI_PINCFG_PACK(SUNXI_PINCTRL_TYPE_FUNC,1));
@@ -574,11 +636,10 @@ static void __init sunxi_dev_init(void)
 	pin_config_set(SUNXI_PINCTRL,SUNXI_PINCTRL_PIN_PL11,SUNXI_PINCFG_PACK(SUNXI_PINCTRL_TYPE_DRV,2));
 	pin_config_set(SUNXI_PINCTRL,SUNXI_PINCTRL_PIN_PL11,SUNXI_PINCFG_PACK(SUNXI_PINCTRL_TYPE_DAT,1));
 #endif
-
 	//printk("Register GC2155 boardinfo\n");
 //	i2c_register_board_info(2, &gc2155_i2c_boardinfo[0], 1);
 
-	i2c_register_board_info(1, &pcf8563_i2c_boardinfo[0], 1);
+//	i2c_register_board_info(1, &pcf8563_i2c_boardinfo[0], 1);
 }
 
 extern void __init sunxi_init_clocks(void);
@@ -651,9 +712,9 @@ MACHINE_START(SUNXI, "sun8i")
 	.fixup		= sun8i_fixup,
 	.nr_irqs	= NR_IRQS,
 #ifdef CONFIG_SMP
-//	.smp		= smp_ops(sunxi_smp_ops),
+	.smp		= smp_ops(sunxi_smp_ops),
 #if defined(CONFIG_ARCH_SUN8IW6) || defined(CONFIG_ARCH_SUN8IW9)
-//	.smp_init	= smp_init_ops(sun8i_smp_init_ops),
+	.smp_init	= smp_init_ops(sun8i_smp_init_ops),
 #endif
 #endif
 MACHINE_END

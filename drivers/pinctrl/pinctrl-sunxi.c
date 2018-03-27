@@ -14,6 +14,7 @@
  * License version 2.  This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
+//#define DEBUG
 #include <linux/bitmap.h>
 #include <linux/io.h>
 #include <linux/clk.h>
@@ -28,6 +29,7 @@
 #include <linux/pinctrl/machine.h>
 #include <linux/pinctrl/pinctrl.h>
 #include <linux/pinctrl/pinconf-sunxi.h>
+#include <linux/pinctrl/pinconf-generic.h>
 #include <linux/pinctrl/pinmux.h>
 #include <linux/platform_device.h>
 #include <linux/slab.h>
@@ -439,7 +441,7 @@ static int sunxi_pinconf_get(struct pinctrl_dev *pctldev,
 
 	pin_reset_bias(&pin_bias, pin);
 	if (IS_ERR_OR_NULL(bank)) {
-		pr_debug("invalid pin number [%d] to get pinconf\n", pin);
+		pr_err("invalid pin number [%d] to get pinconf\n", pin);
 		return -EINVAL;
 	}
 	switch (SUNXI_PINCFG_UNPACK_TYPE(*config)) {
@@ -903,8 +905,7 @@ static struct gpio_chip sunxi_pinctrl_gpio_chip = {
 
 #if defined(CONFIG_OF)
 static struct of_device_id sunxi_pinctrl_match[] = {
-	{ .compatible = "allwinner,sun4i-a10-pinctrl", .data = (void *)&sun4i_a10_pinctrl_data },
-	{ .compatible = "allwinner,sun5i-a13-pinctrl", .data = (void *)&sun5i_a13_pinctrl_data },
+	{ .compatible = "allwinner,sun8i-v3s-pinctrl", .data = (void *)&sunxi_pinctrl_data },
 	{}
 };
 MODULE_DEVICE_TABLE(of, sunxi_pinctrl_match);

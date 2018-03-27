@@ -362,7 +362,7 @@ int fetch_config(struct vfe_dev *dev)
 	{
 		if (SCIRPT_ITEM_VALUE_TYPE_PIO != type) {
 			dev->ccm_cfg[i]->gpio.mclk.gpio = GPIO_INDEX_INVALID;
-			vfe_dbg(0,"fetch vip_dev%d_power_en from sys_config failed\n", i);
+			vfe_dbg(0,"fetch vip_dev%d_csi_mck from sys_config failed\n", i);
 		} else {
 			dev->ccm_cfg[i]->gpio.mclk.gpio = val.gpio.gpio;
 			dev->ccm_cfg[i]->gpio.mclk.mul_sel = val.gpio.mul_sel;
@@ -373,6 +373,186 @@ int fetch_config(struct vfe_dev *dev)
 		}
 	}
 
+	type = script_get_item(vfe_para, "vip_csi_pck", &val);
+	for(i=0; i<dev->dev_qty; i++)
+	{
+		if (SCIRPT_ITEM_VALUE_TYPE_PIO != type) {
+			dev->ccm_cfg[i]->gpio.pclk.gpio = GPIO_INDEX_INVALID;
+			vfe_dbg(0,"fetch vip_dev%d_csi_pck from sys_config failed\n", i);
+		} else {
+			dev->ccm_cfg[i]->gpio.pclk.gpio = val.gpio.gpio;
+			dev->ccm_cfg[i]->gpio.pclk.mul_sel = val.gpio.mul_sel;
+			dev->ccm_cfg[i]->gpio.pclk.pull = val.gpio.pull;
+			dev->ccm_cfg[i]->gpio.pclk.drv_level = val.gpio.drv_level;
+			dev->ccm_cfg[i]->gpio.pclk.data = val.gpio.data;
+			//printk("mclk:%d,%d,%d,%d,%d\n",i, dev->ccm_cfg[i]->gpio.mclk.mul_sel, dev->ccm_cfg[i]->gpio.mclk.pull, dev->ccm_cfg[i]->gpio.mclk.drv_level,dev->ccm_cfg[i]->gpio.mclk.data);
+		}
+	}
+
+	type = script_get_item(vfe_para, "vip_csi_hsync", &val);
+	for(i=0; i<dev->dev_qty; i++)
+	{
+		if (SCIRPT_ITEM_VALUE_TYPE_PIO != type) {
+			dev->ccm_cfg[i]->gpio.hsync.gpio = GPIO_INDEX_INVALID;
+			vfe_dbg(0,"fetch vip_dev%d_csi_hsync from sys_config failed\n", i);
+		} else {
+			dev->ccm_cfg[i]->gpio.hsync.gpio = val.gpio.gpio;
+			dev->ccm_cfg[i]->gpio.hsync.mul_sel = val.gpio.mul_sel;
+			dev->ccm_cfg[i]->gpio.hsync.pull = val.gpio.pull;
+			dev->ccm_cfg[i]->gpio.hsync.drv_level = val.gpio.drv_level;
+			dev->ccm_cfg[i]->gpio.hsync.data = val.gpio.data;
+			//printk("mclk:%d,%d,%d,%d,%d\n",i, dev->ccm_cfg[i]->gpio.mclk.mul_sel, dev->ccm_cfg[i]->gpio.mclk.pull, dev->ccm_cfg[i]->gpio.mclk.drv_level,dev->ccm_cfg[i]->gpio.mclk.data);
+		}
+	}
+	
+	type = script_get_item(vfe_para, "vip_csi_vsync", &val);
+	for(i=0; i<dev->dev_qty; i++)
+	{
+		if (SCIRPT_ITEM_VALUE_TYPE_PIO != type) {
+			dev->ccm_cfg[i]->gpio.vsync.gpio = GPIO_INDEX_INVALID;
+			vfe_dbg(0,"fetch vip_dev%d_csi_vsync from sys_config failed\n", i);
+		} else {
+			dev->ccm_cfg[i]->gpio.vsync.gpio = val.gpio.gpio;
+			dev->ccm_cfg[i]->gpio.vsync.mul_sel = val.gpio.mul_sel;
+			dev->ccm_cfg[i]->gpio.vsync.pull = val.gpio.pull;
+			dev->ccm_cfg[i]->gpio.vsync.drv_level = val.gpio.drv_level;
+			dev->ccm_cfg[i]->gpio.vsync.data = val.gpio.data;
+			//printk("mclk:%d,%d,%d,%d,%d\n",i, dev->ccm_cfg[i]->gpio.mclk.mul_sel, dev->ccm_cfg[i]->gpio.mclk.pull, dev->ccm_cfg[i]->gpio.mclk.drv_level,dev->ccm_cfg[i]->gpio.mclk.data);
+		}
+	}
+
+	/////////////
+	
+	type = script_get_item(vfe_para, "vip_csi_d0", &val);
+	for(i=0; i<dev->dev_qty; i++)
+	{
+		if (SCIRPT_ITEM_VALUE_TYPE_PIO != type) {
+			dev->ccm_cfg[i]->gpio.csi_d0.gpio = GPIO_INDEX_INVALID;
+			vfe_dbg(0,"fetch vip_dev%d_vip_csi_d0 from sys_config failed\n", i);
+		} else {
+			dev->ccm_cfg[i]->gpio.csi_d0.gpio = val.gpio.gpio;
+			dev->ccm_cfg[i]->gpio.csi_d0.mul_sel = val.gpio.mul_sel;
+			dev->ccm_cfg[i]->gpio.csi_d0.pull = val.gpio.pull;
+			dev->ccm_cfg[i]->gpio.csi_d0.drv_level = val.gpio.drv_level;
+			dev->ccm_cfg[i]->gpio.csi_d0.data = val.gpio.data;
+			//printk("mclk:%d,%d,%d,%d,%d\n",i, dev->ccm_cfg[i]->gpio.mclk.mul_sel, dev->ccm_cfg[i]->gpio.mclk.pull, dev->ccm_cfg[i]->gpio.mclk.drv_level,dev->ccm_cfg[i]->gpio.mclk.data);
+		}
+	}
+
+	type = script_get_item(vfe_para, "vip_csi_d1", &val);
+	for(i=0; i<dev->dev_qty; i++)
+	{
+		if (SCIRPT_ITEM_VALUE_TYPE_PIO != type) {
+			dev->ccm_cfg[i]->gpio.csi_d1.gpio = GPIO_INDEX_INVALID;
+			vfe_dbg(0,"fetch vip_dev%d_vip_csi_d1 from sys_config failed\n", i);
+		} else {
+			dev->ccm_cfg[i]->gpio.csi_d1.gpio = val.gpio.gpio;
+			dev->ccm_cfg[i]->gpio.csi_d1.mul_sel = val.gpio.mul_sel;
+			dev->ccm_cfg[i]->gpio.csi_d1.pull = val.gpio.pull;
+			dev->ccm_cfg[i]->gpio.csi_d1.drv_level = val.gpio.drv_level;
+			dev->ccm_cfg[i]->gpio.csi_d1.data = val.gpio.data;
+			//printk("mclk:%d,%d,%d,%d,%d\n",i, dev->ccm_cfg[i]->gpio.mclk.mul_sel, dev->ccm_cfg[i]->gpio.mclk.pull, dev->ccm_cfg[i]->gpio.mclk.drv_level,dev->ccm_cfg[i]->gpio.mclk.data);
+		}
+	}
+	
+	type = script_get_item(vfe_para, "vip_csi_d2", &val);
+	for(i=0; i<dev->dev_qty; i++)
+	{
+		if (SCIRPT_ITEM_VALUE_TYPE_PIO != type) {
+			dev->ccm_cfg[i]->gpio.csi_d2.gpio = GPIO_INDEX_INVALID;
+			vfe_dbg(0,"fetch vip_dev%d_vip_csi_d2 from sys_config failed\n", i);
+		} else {
+			dev->ccm_cfg[i]->gpio.csi_d2.gpio = val.gpio.gpio;
+			dev->ccm_cfg[i]->gpio.csi_d2.mul_sel = val.gpio.mul_sel;
+			dev->ccm_cfg[i]->gpio.csi_d2.pull = val.gpio.pull;
+			dev->ccm_cfg[i]->gpio.csi_d2.drv_level = val.gpio.drv_level;
+			dev->ccm_cfg[i]->gpio.csi_d2.data = val.gpio.data;
+			//printk("mclk:%d,%d,%d,%d,%d\n",i, dev->ccm_cfg[i]->gpio.mclk.mul_sel, dev->ccm_cfg[i]->gpio.mclk.pull, dev->ccm_cfg[i]->gpio.mclk.drv_level,dev->ccm_cfg[i]->gpio.mclk.data);
+		}
+	}
+	
+	type = script_get_item(vfe_para, "vip_csi_d3", &val);
+	for(i=0; i<dev->dev_qty; i++)
+	{
+		if (SCIRPT_ITEM_VALUE_TYPE_PIO != type) {
+			dev->ccm_cfg[i]->gpio.csi_d3.gpio = GPIO_INDEX_INVALID;
+			vfe_dbg(0,"fetch vip_dev%d_vip_csi_d3 from sys_config failed\n", i);
+		} else {
+			dev->ccm_cfg[i]->gpio.csi_d3.gpio = val.gpio.gpio;
+			dev->ccm_cfg[i]->gpio.csi_d3.mul_sel = val.gpio.mul_sel;
+			dev->ccm_cfg[i]->gpio.csi_d3.pull = val.gpio.pull;
+			dev->ccm_cfg[i]->gpio.csi_d3.drv_level = val.gpio.drv_level;
+			dev->ccm_cfg[i]->gpio.csi_d3.data = val.gpio.data;
+			//printk("mclk:%d,%d,%d,%d,%d\n",i, dev->ccm_cfg[i]->gpio.mclk.mul_sel, dev->ccm_cfg[i]->gpio.mclk.pull, dev->ccm_cfg[i]->gpio.mclk.drv_level,dev->ccm_cfg[i]->gpio.mclk.data);
+		}
+	}
+	
+	type = script_get_item(vfe_para, "vip_csi_d4", &val);
+	for(i=0; i<dev->dev_qty; i++)
+	{
+		if (SCIRPT_ITEM_VALUE_TYPE_PIO != type) {
+			dev->ccm_cfg[i]->gpio.csi_d4.gpio = GPIO_INDEX_INVALID;
+			vfe_dbg(0,"fetch vip_dev%d_vip_csi_d4 from sys_config failed\n", i);
+		} else {
+			dev->ccm_cfg[i]->gpio.csi_d4.gpio = val.gpio.gpio;
+			dev->ccm_cfg[i]->gpio.csi_d4.mul_sel = val.gpio.mul_sel;
+			dev->ccm_cfg[i]->gpio.csi_d4.pull = val.gpio.pull;
+			dev->ccm_cfg[i]->gpio.csi_d4.drv_level = val.gpio.drv_level;
+			dev->ccm_cfg[i]->gpio.csi_d4.data = val.gpio.data;
+			//printk("mclk:%d,%d,%d,%d,%d\n",i, dev->ccm_cfg[i]->gpio.mclk.mul_sel, dev->ccm_cfg[i]->gpio.mclk.pull, dev->ccm_cfg[i]->gpio.mclk.drv_level,dev->ccm_cfg[i]->gpio.mclk.data);
+		}
+	}
+	
+	type = script_get_item(vfe_para, "vip_csi_d5", &val);
+	for(i=0; i<dev->dev_qty; i++)
+	{
+		if (SCIRPT_ITEM_VALUE_TYPE_PIO != type) {
+			dev->ccm_cfg[i]->gpio.csi_d5.gpio = GPIO_INDEX_INVALID;
+			vfe_dbg(0,"fetch vip_dev%d_vip_csi_d5 from sys_config failed\n", i);
+		} else {
+			dev->ccm_cfg[i]->gpio.csi_d5.gpio = val.gpio.gpio;
+			dev->ccm_cfg[i]->gpio.csi_d5.mul_sel = val.gpio.mul_sel;
+			dev->ccm_cfg[i]->gpio.csi_d5.pull = val.gpio.pull;
+			dev->ccm_cfg[i]->gpio.csi_d5.drv_level = val.gpio.drv_level;
+			dev->ccm_cfg[i]->gpio.csi_d5.data = val.gpio.data;
+			//printk("mclk:%d,%d,%d,%d,%d\n",i, dev->ccm_cfg[i]->gpio.mclk.mul_sel, dev->ccm_cfg[i]->gpio.mclk.pull, dev->ccm_cfg[i]->gpio.mclk.drv_level,dev->ccm_cfg[i]->gpio.mclk.data);
+		}
+	}
+	
+	type = script_get_item(vfe_para, "vip_csi_d6", &val);
+	for(i=0; i<dev->dev_qty; i++)
+	{
+		if (SCIRPT_ITEM_VALUE_TYPE_PIO != type) {
+			dev->ccm_cfg[i]->gpio.csi_d6.gpio = GPIO_INDEX_INVALID;
+			vfe_dbg(0,"fetch vip_dev%d_vip_csi_d6 from sys_config failed\n", i);
+		} else {
+			dev->ccm_cfg[i]->gpio.csi_d6.gpio = val.gpio.gpio;
+			dev->ccm_cfg[i]->gpio.csi_d6.mul_sel = val.gpio.mul_sel;
+			dev->ccm_cfg[i]->gpio.csi_d6.pull = val.gpio.pull;
+			dev->ccm_cfg[i]->gpio.csi_d6.drv_level = val.gpio.drv_level;
+			dev->ccm_cfg[i]->gpio.csi_d6.data = val.gpio.data;
+			//printk("mclk:%d,%d,%d,%d,%d\n",i, dev->ccm_cfg[i]->gpio.mclk.mul_sel, dev->ccm_cfg[i]->gpio.mclk.pull, dev->ccm_cfg[i]->gpio.mclk.drv_level,dev->ccm_cfg[i]->gpio.mclk.data);
+		}
+	}
+	
+	type = script_get_item(vfe_para, "vip_csi_d7", &val);
+	for(i=0; i<dev->dev_qty; i++)
+	{
+		if (SCIRPT_ITEM_VALUE_TYPE_PIO != type) {
+			dev->ccm_cfg[i]->gpio.csi_d7.gpio = GPIO_INDEX_INVALID;
+			vfe_dbg(0,"fetch vip_dev%d_vip_csi_d7 from sys_config failed\n", i);
+		} else {
+			dev->ccm_cfg[i]->gpio.csi_d7.gpio = val.gpio.gpio;
+			dev->ccm_cfg[i]->gpio.csi_d7.mul_sel = val.gpio.mul_sel;
+			dev->ccm_cfg[i]->gpio.csi_d7.pull = val.gpio.pull;
+			dev->ccm_cfg[i]->gpio.csi_d7.drv_level = val.gpio.drv_level;
+			dev->ccm_cfg[i]->gpio.csi_d7.data = val.gpio.data;
+			//printk("mclk:%d,%d,%d,%d,%d\n",i, dev->ccm_cfg[i]->gpio.mclk.mul_sel, dev->ccm_cfg[i]->gpio.mclk.pull, dev->ccm_cfg[i]->gpio.mclk.drv_level,dev->ccm_cfg[i]->gpio.mclk.data);
+		}
+	}	
+	
+	////////////////////////////
+	
 	for(i=0; i<dev->dev_qty; i++)
 	{
 		/* i2c and module name*/

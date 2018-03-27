@@ -14,7 +14,8 @@
 #include <linux/clk-provider.h>
 #include <linux/clkdev.h>
 #include <linux/delay.h>
-#include <linux/clk/sunxi.h>
+#include <linux/err.h>
+//#include <linux/clk/sunxi.h>
 #include <mach/sys_config.h>
 #include "clk-sunxi.h"
 #include "clk-factors.h"
@@ -475,6 +476,7 @@ void __init sunxi_init_clocks(void)
         factor = &sunxi_factos[i];
         clk = sunxi_clk_register_factors(NULL,  sunxi_clk_base, &clk_lock,factor);
         clk_register_clkdev(clk, factor->name, NULL);
+        printk("name %s clk %d \n", factor->name,clk);
     }
 
     /* register fixed factors, based on clk-fixed-factor framework, such as pllx2 for ex. */

@@ -22,7 +22,7 @@
 #include <linux/kobject.h>
 #include <linux/platform_device.h>
 #include <linux/clk.h>
-#include <linux/clk/sunxi_name.h>
+#include <mach/clk/sunxi_name.h>
 #include <linux/gpio.h>
 #include <linux/io.h>
 #include <mach/irqs.h>

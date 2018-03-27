@@ -181,9 +181,9 @@ static void insmod_device_driver(struct usb_msg_center_info *center_info)
 	DMSG_INFO("\n\ninsmod_device_driver\n\n");
 
 	set_usb_role(center_info, USB_ROLE_DEVICE);
-
+#ifdef CONFIG_USB_SUNXI_UDC0
 	sunxi_usb_device_enable();
-
+#endif
 	return;
 }
 
@@ -192,9 +192,9 @@ static void rmmod_device_driver(struct usb_msg_center_info *center_info)
 	DMSG_INFO("\n\nrmmod_device_driver\n\n");
 
 	set_usb_role(center_info, USB_ROLE_NULL);
-
+#ifdef CONFIG_USB_SUNXI_UDC0
 	sunxi_usb_device_disable();
-
+#endif
 #if defined(CONFIG_AW_AXP)
 	axp_usbcur(CHARGE_AC);
 	axp_usbvol(CHARGE_AC);

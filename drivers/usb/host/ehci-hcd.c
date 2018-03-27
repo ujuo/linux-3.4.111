@@ -334,9 +334,9 @@ static int ehci_reset (struct ehci_hcd *ehci)
 
 	if (ehci->has_hostpc) {
 		ehci_writel(ehci, USBMODE_EX_HC | USBMODE_EX_VBPS,
-			(u32 __iomem *)(((u8 *)ehci->regs) + USBMODE_EX));
+			(u32 __iomem *)(((u8 * __force)ehci->regs) + USBMODE_EX));
 		ehci_writel(ehci, TXFIFO_DEFAULT,
-			(u32 __iomem *)(((u8 *)ehci->regs) + TXFILLTUNING));
+			(u32 __iomem *)(((u8 * __force)ehci->regs) + TXFILLTUNING));
 	}
 	if (retval)
 		return retval;
@@ -502,7 +502,7 @@ static void ehci_shutdown(struct usb_hcd *hcd)
 	ehci_silence_controller(ehci);
 	spin_unlock_irq(&ehci->lock);
 }
-
+#ifdef CONFIG_PM
 static void ehci_port_power (struct ehci_hcd *ehci, int is_on)
 {
 	unsigned port;
@@ -520,7 +520,7 @@ static void ehci_port_power (struct ehci_hcd *ehci, int is_on)
 	ehci_readl(ehci, &ehci->regs->command);
 	msleep(20);
 }
-
+#endif
 /*-------------------------------------------------------------------------*/
 
 /*
@@ -909,7 +909,47 @@ static irqreturn_t ehci_irq (struct usb_hcd *hcd)
 	if (status & STS_PCD) {
 		unsigned	i = HCS_N_PORTS (ehci->hcs_params);
 		u32		ppcd = 0;
+{
+		int pstatus0 = 0;
 
+		pstatus0 = ehci_readl(ehci, &ehci->regs->port_status[0]);
+
+		if((pstatus0 & PORT_CONNECT) && (pstatus0 & PORT_CSC)){
+#ifdef  CONFIG_USB_SUNXI_HSIC
+		u32 reg_value = 0;
+		u32 tmp= 0;
+		reg_value = ehci_readl(ehci, (__u32 __iomem *)(ehci->caps + 0x800));
+		tmp = ehci_readl(ehci, (__u32 __iomem *)(ehci->caps + 0x804));
+		if((reg_value &(0x01 << 16)) && (tmp &(0x01 << 16))){
+			reg_value = ehci_readl(ehci, (__u32 __iomem *)(ehci->caps + 0x800));
+			reg_value &= ~(0x01 << 17);
+			ehci_writel(ehci, reg_value, (__u32 __iomem *)(ehci->caps + 0x800));
+			printk("ehci_irq:caps_add:0x%p,caps:0x%x\n", ehci->caps, ehci_readl(ehci, (__u32 __iomem *)(ehci->caps + 0x800)));
+		}
+#endif
+		printk("ehci_irq: highspeed device connect\n");
+
+#if defined(CONFIG_ARCH_SUN9IW1) && !defined(CONFIG_USB_SUSPEND)
+{
+			int temp_val = 0;
+			temp_val = ehci_readl(ehci, (hcd->regs  +  0x404));
+			temp_val = temp_val &  (~(0x3 << 6));
+			ehci_writel(ehci, temp_val, (hcd->regs + 0x404));
+}
+#endif
+		}else if(!(pstatus0 & PORT_CONNECT) && (pstatus0 & PORT_CSC)){
+#if defined(CONFIG_ARCH_SUN9IW1) && !defined(CONFIG_USB_SUSPEND)
+{
+			int temp_val = 0;
+			temp_val = ehci_readl(ehci, (hcd->regs  +  0x404));
+			temp_val = temp_val &  (~(0x3 << 6));
+			temp_val = temp_val | (0x2 << 6);
+			ehci_writel(ehci, temp_val, (hcd->regs + 0x404));
+}
+#endif
+			printk("ehci_irq: highspeed device disconnect\n");
+		}
+}
 		/* kick root hub later */
 		pcd_status = status;
 
@@ -989,6 +1029,76 @@ dead:
  * NOTE:  control, bulk, and interrupt share the same code to append TDs
  * to a (possibly active) QH, and the same QH scanning code.
  */
+
+/* swpark add for nxp2120 usb host bug */
+#ifdef CONFIG_NXP2120_USB_BUGFIX
+
+static inline int is_bugfix_nxp2120_usb(struct urb *urb)
+{
+	if (usb_urb_dir_out(urb)) {
+		int align_4 = urb->transfer_buffer_length % 4;
+		if (align_4 == 2 || align_4 == 3) {
+			return align_4;
+		}
+	}
+	return 0;
+}
+
+static int rearrange_urb_transmit_buffer(struct nxp2120_usb_bugfix *bugfix, struct urb *urb, int align_4, int tpos)
+{
+	void *new_buffer;
+	dma_addr_t new_dma_addr;
+	u32 new_buffer_length;
+	u32 *org_word_buf, *new_word_buf;
+	//int copy_count;
+
+	new_buffer_length = ((urb->transfer_buffer_length+3)/4)*4 + 4*3;
+
+	//printk("transfer_buffer=%X\n", bugfix->transfer_buffer);
+	new_buffer = bugfix->transfer_buffer; //usb_alloc_coherent(urb->dev, new_buffer_length, GFP_KERNEL, &new_dma_addr);
+	new_dma_addr = bugfix->transfer_dma;
+
+	if (!new_buffer) {
+		printk("[NXP2120 USB BUGPATCH] Error: can't alloc new buffer size(%d)\n", new_buffer_length);
+		return -1;
+	}
+
+	// copy all org buffer to new buffer
+	memcpy(new_buffer, urb->transfer_buffer, urb->transfer_buffer_length);
+
+	if (urb->transfer_buffer_length > 4)
+		org_word_buf = (u32 *)urb->transfer_buffer + (urb->transfer_buffer_length-1)/4; // last buffer
+	else
+		org_word_buf = (u32 *)urb->transfer_buffer;
+
+	new_word_buf = (u32 *)new_buffer + urb->transfer_buffer_length/4;
+
+	//copy_count = new_buffer_length - urb->transfer_buffer_length;
+	new_word_buf++;
+	*new_word_buf = *org_word_buf;
+	new_word_buf++;
+	*new_word_buf = *org_word_buf;
+	new_word_buf++;
+	*new_word_buf = *org_word_buf;
+
+	bugfix->urb = urb;
+	bugfix->org_transfer_buffer = urb->transfer_buffer;
+	bugfix->org_transfer_dma = urb->transfer_dma;
+	bugfix->real_transfer_buffer_length = new_buffer_length;
+//	bugfix->transfer_buffer = new_buffer;
+//	bugfix->transfer_dma    = new_dma_addr;
+
+	urb->transfer_buffer = new_buffer;
+	urb->transfer_dma = new_dma_addr;
+
+#ifdef CONFIG_NXP2120_USB_BUGFIX_MSG
+    printk("Alloc: %p, 0x%x, %d(org:%x %x)\n", urb->transfer_buffer, urb->transfer_dma, bugfix->real_transfer_buffer_length, bugfix->org_transfer_buffer, bugfix->org_transfer_dma);
+#endif
+
+	return 0;
+}
+#endif
+
 static int ehci_urb_enqueue (
 	struct usb_hcd	*hcd,
 	struct urb	*urb,
@@ -998,6 +1108,63 @@ static int ehci_urb_enqueue (
 	struct list_head	qtd_list;
 
 	INIT_LIST_HEAD (&qtd_list);
+
+	/* swpark add for nxp2120 usb mem read bugfix */
+#ifdef CONFIG_NXP2120_USB_BUGFIX
+	{
+		int align_4 = is_bugfix_nxp2120_usb(urb);
+		if (align_4 == 2 || align_4 == 3) {
+		    int i;
+		    unsigned t;
+		    int done = 0;
+		    t = 1;
+		    for (i=0; i<32; i++) {
+		        if ((t & ehci->dw_flag_nxp2120_bugfix) && (ehci->nxp2120_bugfix[i].urb == urb)) {/* If this urb is already used urb, not to do anything */
+		            int ret;
+		            struct nxp2120_usb_bugfix *bugfix = &ehci->nxp2120_bugfix[i];
+		            if (ehci->nxp2120_bugfix[i].transfer_buffer != urb->transfer_buffer) { /* but if this urb has new transfer address, alloc new buffer */
+		                //usb_buffer_free(urb->dev, bugfix->real_transfer_buffer_length, bugfix->transfer_buffer, bugfix->transfer_dma);
+		                ret = rearrange_urb_transmit_buffer(bugfix, urb, align_4, i);
+		                if (ret < 0) {
+				            printk("[NXP2120 USB BUGPATCH]:1 return ENOMEM\n");
+				            return -ENOMEM;
+				        }
+		            }
+		            done = 1;
+		            break;
+		        }
+		        t <<= 1;
+		    }
+		    if (!done) {
+		        t = 1;
+		        for (i=0; i<32; i++) {
+		            if (0 == (t & ehci->dw_flag_nxp2120_bugfix)) {
+		                int ret;
+		                struct nxp2120_usb_bugfix *bugfix;
+		                bugfix = &ehci->nxp2120_bugfix[i];
+		                //memset(bugfix, 0, sizeof(struct nxp2120_usb_bugfix));
+#ifdef CONFIG_NXP2120_USB_BUGFIX_MSG
+                        printk("===> Enter BugPatch: %d tr length(%d)\n", align_4, urb->transfer_buffer_length);
+#endif
+				        ret = rearrange_urb_transmit_buffer(bugfix, urb, align_4, i);
+				        if (ret < 0) {
+				            printk("[NXP2120 USB BUGPATCH]:2 return ENOMEM\n");
+				            return -ENOMEM;
+				        }
+				        ehci->dw_flag_nxp2120_bugfix |= t;
+				        done = 1;
+				        break;
+				    }
+				    t <<= 1;
+				}
+				if (!done) {
+				    printk("[NXP2120 USB BUGPATCH] can't alloc bugfix struct return ENOMEM\n");
+				    return -ENOMEM;
+				}
+			}
+		}
+	}
+#endif
 
 	switch (usb_pipetype (urb->pipe)) {
 	case PIPE_CONTROL:
@@ -1385,6 +1552,16 @@ MODULE_LICENSE ("GPL");
 #ifdef CONFIG_USB_SUNXI_HCI
 #include "ehci_sunxi.c"
 #define	PLATFORM_DRIVER		sunxi_ehci_hcd_driver
+#endif
+
+#ifdef CONFIG_USB_EHCI_NXP4330
+#include "ehci-nxp4330.c"
+#define	PLATFORM_DRIVER		nxp_ehci_driver
+#endif
+
+#ifdef CONFIG_USB_EHCI_NXP2120
+#include "ehci-nxp2120.c"
+#define PLATFORM_DRIVER		ehci_hcd_nexell_driver
 #endif
 
 #if !defined(PCI_DRIVER) && !defined(PLATFORM_DRIVER) && \

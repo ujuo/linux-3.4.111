@@ -1,3 +1,4 @@
+
 #include <linux/module.h>
 #include <mach/ion_sunxi.h>
 #include "vfe_os.h"
@@ -304,8 +305,9 @@ EXPORT_SYMBOL_GPL(os_gpio_set_status);
 int os_mem_alloc(struct vfe_mm *mem_man)
 {
 	void *vaddr = NULL;
-
+//	printk("%s enter \n", __func__);
 	vaddr = sunxi_buf_alloc(mem_man->size, (u32 *)&mem_man->phy_addr);
+//	printk("vaddr 0x%X\n", vaddr);
 	if (vaddr) {
 		mem_man->vir_addr = vaddr;
  		mem_man->dma_addr = mem_man->phy_addr + HW_DMA_OFFSET- CPU_DRAM_PADDR_ORG;        
@@ -313,6 +315,7 @@ int os_mem_alloc(struct vfe_mm *mem_man)
 		vfe_err("os_mem_alloc error, size = %d\n", mem_man->size);
 		return -ENOMEM;
 	}
+//	printk("mem_man->vir_addr 0x%X mem_man->dma_addr 0x%X\n", mem_man->vir_addr, mem_man->dma_addr);
 	return 0;
 }
 EXPORT_SYMBOL_GPL(os_mem_alloc);
