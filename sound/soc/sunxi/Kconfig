@@ -1,0 +1,15 @@
+
+config SND_V3_SOC
+	tristate "SoC Audio support for the V3 chips"
+	depends on ARCH_SUN8IW8
+	select SND_SOC_DMAENGINE_PCM
+	default n
+	help
+		Say Y or M if you want to add sun8iw8 audiocodec support
+		
+config SND_SOC_V3_CODEC
+	tristate "Build V3 CODEC driver"
+	default n
+	help
+		Say Y or M if you want to add sun8iw8 audiocodec support	
+

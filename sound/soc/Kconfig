@@ -48,6 +48,20 @@ source "sound/soc/s6000/Kconfig"
 source "sound/soc/sh/Kconfig"
 source "sound/soc/tegra/Kconfig"
 source "sound/soc/txx9/Kconfig"
+if ARCH_NXP4330
+#source "sound/soc/nexell/Kconfig"
+endif
+
+if ARCH_NXP2120
+#source "sound/soc/nxp2120/Kconfig"
+endif
+
+if ARCH_SUN8IW8P1
+#source "sound/soc/sunxi/audiocodec/Kconfig"
+#source "sound/soc/sunxi/i2s0/Kconfig"
+#source "sound/soc/sunxi/i2s1/Kconfig"
+source "sound/soc/sunxi/Kconfig"
+endif
 
 # Supported codecs
 source "sound/soc/codecs/Kconfig"

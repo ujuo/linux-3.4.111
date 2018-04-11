@@ -26,3 +26,19 @@ obj-$(CONFIG_SND_SOC)	+= s6000/
 obj-$(CONFIG_SND_SOC)	+= sh/
 obj-$(CONFIG_SND_SOC)	+= tegra/
 obj-$(CONFIG_SND_SOC)	+= txx9/
+ifeq ($(CONFIG_ARCH_NXP4330), y)
+obj-$(CONFIG_SND_SOC)   += nexell/
+endif
+
+ifeq ($(CONFIG_ARCH_NXP2120), y)
+obj-$(CONFIG_SND_SOC) += nxp2120/
+endif
+
+ifeq ($(CONFIG_ARCH_SUN8IW8P1), y)
+#obj-$(CONFIG_SND_SOC) += sunxi/audiocodec/
+#obj-$(CONFIG_SND_SOC) += sunxi/i2s0/
+#obj-$(CONFIG_SND_SOC) += sunxi/i2s1/
+obj-$(CONFIG_SND_SOC) += sunxi/
+endif
+
+
